@@ -1,0 +1,325 @@
+{{- /*
+  首页首屏（Stage 0）
+  · 全屏底图 + 居中「逐笔书写」标题（SVG 单线字形，按真实笔顺一段一段画出来）
+  · 与 #wrap 同级、position: fixed，由 static/js/home-deck.js 控制横向切换
+
+  字形表 $glyphs 覆盖 A-Z / a-z / 空格。改标题只需改 params.yml 的 home_hero.title，
+  任意大小写英文（含空格）都能走笔顺动画；含表外字符（中文等）则退回逐字渐显。
+
+  每个字母：
+    aw  = 字宽（advance width）
+    s   = 笔画数组，按书写先后排列；d 是 SVG 路径，sw 是该笔相对长度（决定写多久）
+    bot = 可选，只有降部字母（g/j/p/q/y）需要，默认基线 y=100
+
+  表内先列大写 A-Z，再列小写 a-z。
+  坐标：基线 y=100，大写顶 y=0，小写 x-height 顶 y=28（圆形字留 4 格视觉溢出到 y=24），
+        小写升部顶 y=0，降部底 y=126。
+*/ -}}
+{{- $p := .Site.Params.home_hero | default dict -}}
+{{- /* title 未配置时退回站点标题；字形表覆盖 A-Z/a-z/空格，其他字符走渐显 */ -}}
+{{- $title := $p.title | default .Site.Title -}}
+{{- $subtitle := $p.subtitle -}}
+{{- $banner := $p.banner | default .Site.Params.banner -}}
+{{- $chars := split $title "" -}}
+
+{{- $glyphs := dict
+  " " (dict "aw" 26 "s" (slice))
+
+  "A" (dict "aw" 70 "s" (slice
+        (dict "d" "M4 100 L35 0" "sw" 108)
+        (dict "d" "M35 0 L66 100" "sw" 108)
+        (dict "d" "M18 62 L52 62" "sw" 34)))
+  "B" (dict "aw" 66 "s" (slice
+        (dict "d" "M10 0 L10 100" "sw" 100)
+        (dict "d" "M10 0 C46 0 58 10 58 25 C58 40 46 50 10 50" "sw" 108)
+        (dict "d" "M10 50 C50 50 62 62 62 78 C62 94 48 100 10 100" "sw" 120)))
+  "C" (dict "aw" 64 "s" (slice
+        (dict "d" "M56 24 C46 10 38 2 30 2 C14 2 4 26 4 50 C4 74 14 98 30 98 C40 98 50 92 56 80" "sw" 196)))
+  "D" (dict "aw" 68 "s" (slice
+        (dict "d" "M10 0 L10 100" "sw" 100)
+        (dict "d" "M10 0 C44 0 60 20 60 50 C60 80 44 100 10 100" "sw" 188)))
+  "E" (dict "aw" 58 "s" (slice
+        (dict "d" "M10 0 L10 100" "sw" 100)
+        (dict "d" "M10 0 L54 0" "sw" 44)
+        (dict "d" "M10 50 L46 50" "sw" 36)
+        (dict "d" "M10 100 L54 100" "sw" 44)))
+  "F" (dict "aw" 58 "s" (slice
+        (dict "d" "M10 0 L10 100" "sw" 100)
+        (dict "d" "M10 0 L54 0" "sw" 44)
+        (dict "d" "M10 48 L46 48" "sw" 36)))
+  "G" (dict "aw" 70 "s" (slice
+        (dict "d" "M60 28 C50 12 40 2 32 2 C16 2 4 26 4 50 C4 74 16 98 32 98 C48 98 60 84 62 62 L62 50 L40 50" "sw" 216)))
+  "H" (dict "aw" 72 "s" (slice
+        (dict "d" "M10 0 L10 100" "sw" 100)
+        (dict "d" "M10 50 L62 50" "sw" 52)
+        (dict "d" "M62 0 L62 100" "sw" 100)))
+  "I" (dict "aw" 20 "s" (slice
+        (dict "d" "M4 0 L16 0" "sw" 12)
+        (dict "d" "M10 0 L10 100" "sw" 100)
+        (dict "d" "M4 100 L16 100" "sw" 12)))
+  "J" (dict "aw" 46 "s" (slice
+        (dict "d" "M4 0 L32 0" "sw" 28)
+        (dict "d" "M28 0 L28 76 C28 92 20 100 12 100 C6 100 2 96 2 88" "sw" 104)))
+  "K" (dict "aw" 62 "s" (slice
+        (dict "d" "M10 0 L10 100" "sw" 100)
+        (dict "d" "M56 0 L12 48" "sw" 66)
+        (dict "d" "M26 42 L58 100" "sw" 72)))
+  "L" (dict "aw" 54 "s" (slice
+        (dict "d" "M10 0 L10 100" "sw" 100)
+        (dict "d" "M10 100 L50 100" "sw" 40)))
+  "M" (dict "aw" 84 "s" (slice
+        (dict "d" "M8 100 L8 0" "sw" 100)
+        (dict "d" "M8 0 L42 52" "sw" 70)
+        (dict "d" "M42 52 L76 0" "sw" 70)
+        (dict "d" "M76 0 L76 100" "sw" 100)))
+  "N" (dict "aw" 68 "s" (slice
+        (dict "d" "M10 100 L10 0" "sw" 100)
+        (dict "d" "M10 0 L58 100" "sw" 112)
+        (dict "d" "M58 100 L58 0" "sw" 100)))
+  "O" (dict "aw" 70 "s" (slice
+        (dict "d" "M35 2 C54 2 66 24 66 50 C66 76 54 98 35 98 C16 98 4 76 4 50 C4 24 16 2 35 2 Z" "sw" 220)))
+  "P" (dict "aw" 60 "s" (slice
+        (dict "d" "M10 100 L10 0" "sw" 100)
+        (dict "d" "M10 0 C44 0 56 12 56 26 C56 40 44 50 10 50" "sw" 116)))
+  "Q" (dict "aw" 74 "s" (slice
+        (dict "d" "M36 2 C55 2 68 24 68 50 C68 76 55 98 36 98 C17 98 4 76 4 50 C4 24 17 2 36 2 Z" "sw" 220)
+        (dict "d" "M46 72 L66 100" "sw" 36)))
+  "R" (dict "aw" 64 "s" (slice
+        (dict "d" "M10 100 L10 0" "sw" 100)
+        (dict "d" "M10 0 C42 0 54 12 54 26 C54 40 42 50 10 50" "sw" 112)
+        (dict "d" "M30 50 L58 100" "sw" 62)))
+  "S" (dict "aw" 60 "s" (slice
+        (dict "d" "M52 16 C44 6 36 2 28 2 C14 2 6 12 6 24 C6 42 52 48 52 70 C52 86 42 98 30 98 C22 98 14 94 8 86" "sw" 186)))
+  "T" (dict "aw" 64 "s" (slice
+        (dict "d" "M2 6 L62 6" "sw" 60)
+        (dict "d" "M32 6 L32 100" "sw" 94)))
+  "U" (dict "aw" 66 "s" (slice
+        (dict "d" "M10 0 L10 70 C10 88 20 100 34 100 C48 100 58 88 58 70 L58 0" "sw" 182)))
+  "V" (dict "aw" 64 "s" (slice
+        (dict "d" "M4 0 L32 100" "sw" 106)
+        (dict "d" "M32 100 L60 0" "sw" 106)))
+  "W" (dict "aw" 88 "s" (slice
+        (dict "d" "M4 0 L20 100 L40 40 L60 100 L76 0" "sw" 320)))
+  "X" (dict "aw" 62 "s" (slice
+        (dict "d" "M6 0 L56 100" "sw" 111)
+        (dict "d" "M56 0 L6 100" "sw" 111)))
+  "Y" (dict "aw" 62 "s" (slice
+        (dict "d" "M4 0 L31 48" "sw" 54)
+        (dict "d" "M58 0 L31 48" "sw" 54)
+        (dict "d" "M31 48 L31 100" "sw" 52)))
+  "Z" (dict "aw" 60 "s" (slice
+        (dict "d" "M4 0 L56 0" "sw" 52)
+        (dict "d" "M56 0 L4 100" "sw" 111)
+        (dict "d" "M4 100 L56 100" "sw" 52)))
+
+  "a" (dict "aw" 62 "s" (slice
+        (dict "d" "M28 24 C44 24 52 40 52 62 C52 84 44 100 28 100 C12 100 4 84 4 62 C4 40 12 24 28 24 Z" "sw" 200)
+        (dict "d" "M52 24 L52 100" "sw" 76)))
+  "b" (dict "aw" 62 "s" (slice
+        (dict "d" "M10 0 L10 100" "sw" 100)
+        (dict "d" "M10 62 C10 38 20 24 32 24 C46 24 54 38 54 62 C54 86 46 100 32 100 C20 100 10 88 10 62" "sw" 186)))
+  "c" (dict "aw" 58 "s" (slice
+        (dict "d" "M52 42 C44 32 34 28 26 28 C12 28 4 46 4 64 C4 84 14 100 28 100 C38 100 46 94 52 84" "sw" 176)))
+  "d" (dict "aw" 62 "s" (slice
+        (dict "d" "M52 62 C52 38 42 24 30 24 C18 24 8 38 8 62 C8 86 18 100 30 100 C42 100 52 86 52 62" "sw" 186)
+        (dict "d" "M52 0 L52 100" "sw" 100)))
+  "e" (dict "aw" 64 "s" (slice
+        (dict "d" "M4 60 L58 60" "sw" 54)
+        (dict "d" "M58 60 C58 38 46 22 32 22 C16 22 4 36 4 60 C4 84 16 100 32 100 C42 100 52 96 56 88" "sw" 190)))
+  "f" (dict "aw" 36 "s" (slice
+        (dict "d" "M32 10 C32 2 26 0 22 0 L22 100" "sw" 112)
+        (dict "d" "M4 30 L34 30" "sw" 30)))
+  "g" (dict "aw" 62 "bot" 128 "s" (slice
+        (dict "d" "M52 62 C52 38 42 24 30 24 C18 24 8 38 8 62 C8 86 18 100 30 100 C42 100 52 86 52 62" "sw" 186)
+        (dict "d" "M52 24 L52 112 C52 124 44 128 32 126" "sw" 112)))
+  "h" (dict "aw" 58 "s" (slice
+        (dict "d" "M10 0 L10 100" "sw" 100)
+        (dict "d" "M10 54 C12 34 26 26 40 30 C50 33 56 42 56 54 L56 100" "sw" 118)))
+  "i" (dict "aw" 14 "s" (slice
+        (dict "d" "M7 28 L7 100" "sw" 72)
+        (dict "d" "M7 6 L7 9" "sw" 6)))
+  "j" (dict "aw" 24 "bot" 128 "s" (slice
+        (dict "d" "M10 28 L10 110 C10 124 4 128 -4 126" "sw" 102)
+        (dict "d" "M10 6 L10 9" "sw" 6)))
+  "k" (dict "aw" 56 "s" (slice
+        (dict "d" "M10 0 L10 100" "sw" 100)
+        (dict "d" "M48 28 L12 56" "sw" 48)
+        (dict "d" "M24 46 L50 100" "sw" 66)))
+  "l" (dict "aw" 14 "s" (slice
+        (dict "d" "M7 0 L7 100" "sw" 100)))
+  "m" (dict "aw" 86 "s" (slice
+        (dict "d" "M10 28 L10 100" "sw" 72)
+        (dict "d" "M10 54 C12 34 24 26 36 30 C44 33 48 40 48 54 L48 100" "sw" 118)
+        (dict "d" "M48 54 C50 34 62 26 74 30 C82 33 86 40 86 54 L86 100" "sw" 118)))
+  "n" (dict "aw" 58 "s" (slice
+        (dict "d" "M10 28 L10 100" "sw" 72)
+        (dict "d" "M10 54 C12 32 26 24 40 28 C50 32 56 40 56 54 L56 100" "sw" 116)))
+  "o" (dict "aw" 62 "s" (slice
+        (dict "d" "M31 24 C46 24 58 36 58 62 C58 86 46 100 31 100 C16 100 4 86 4 62 C4 36 16 24 31 24 Z" "sw" 214)))
+  "p" (dict "aw" 62 "bot" 128 "s" (slice
+        (dict "d" "M10 28 L10 126" "sw" 98)
+        (dict "d" "M10 62 C10 38 20 24 32 24 C46 24 54 38 54 62 C54 86 46 100 32 100 C20 100 10 88 10 62" "sw" 186)))
+  "q" (dict "aw" 62 "bot" 128 "s" (slice
+        (dict "d" "M52 62 C52 38 42 24 30 24 C18 24 8 38 8 62 C8 86 18 100 30 100 C42 100 52 86 52 62" "sw" 186)
+        (dict "d" "M52 24 L52 126" "sw" 98)))
+  "r" (dict "aw" 46 "s" (slice
+        (dict "d" "M12 28 L12 100" "sw" 72)
+        (dict "d" "M12 56 C14 34 28 26 42 31" "sw" 50)))
+  "s" (dict "aw" 54 "s" (slice
+        (dict "d" "M48 40 C42 32 34 28 26 28 C14 28 6 36 6 48 C6 62 46 68 46 82 C46 94 38 100 28 100 C20 100 12 96 6 88" "sw" 166)))
+  "t" (dict "aw" 36 "s" (slice
+        (dict "d" "M16 0 L16 88 C16 96 22 100 30 100" "sw" 94)
+        (dict "d" "M4 30 L32 30" "sw" 28)))
+  "u" (dict "aw" 58 "s" (slice
+        (dict "d" "M10 28 L10 72 C10 88 20 100 34 100 C48 100 56 88 56 72 L56 28" "sw" 152)))
+  "v" (dict "aw" 52 "s" (slice
+        (dict "d" "M4 28 L26 100 L48 28" "sw" 154)))
+  "w" (dict "aw" 76 "s" (slice
+        (dict "d" "M4 28 L18 100 L38 48 L58 100 L72 28" "sw" 188)))
+  "x" (dict "aw" 52 "s" (slice
+        (dict "d" "M6 28 L46 100" "sw" 84)
+        (dict "d" "M46 28 L6 100" "sw" 84)))
+  "y" (dict "aw" 54 "bot" 128 "s" (slice
+        (dict "d" "M4 28 L26 76" "sw" 55)
+        (dict "d" "M48 28 L12 110 C8 122 2 126 -6 124" "sw" 112)))
+  "z" (dict "aw" 54 "s" (slice
+        (dict "d" "M6 28 L48 28" "sw" 42)
+        (dict "d" "M48 28 L6 100" "sw" 95)
+        (dict "d" "M6 100 L48 100" "sw" 42)))
+-}}
+
+{{- /* 标题里每个字都有字形才走笔顺动画，否则退回渐显 */ -}}
+{{- $canWrite := true -}}
+{{- range $chars -}}
+  {{- if not (index $glyphs .) -}}{{- $canWrite = false -}}{{- end -}}
+{{- end -}}
+
+{{- $spacing := 12 -}}
+{{- $speed := $p.speed | default 1.0 -}}{{- /* 每单位长度的书写耗时（ms），可在 home_hero 调 */ -}}
+{{- $gap := 20 -}}{{- /* 笔画之间抬笔的停顿 */ -}}
+{{- $letterGap := 30 -}}{{- /* 字与字之间 */ -}}
+{{- $start := 240 -}}
+
+{{- $wordWidth := 0 -}}
+{{- $viewBottom := 100 -}}{{- /* 有降部的标题自动扩高画布，否则保持原来的 116 */ -}}
+{{- if $canWrite -}}
+  {{- range $i, $c := $chars -}}
+    {{- with index $glyphs $c -}}
+      {{- $wordWidth = add $wordWidth .aw -}}
+      {{- if gt $i 0 -}}{{- $wordWidth = add $wordWidth $spacing -}}{{- end -}}
+      {{- if isset . "bot" -}}
+        {{- if gt (index . "bot") $viewBottom -}}{{- $viewBottom = index . "bot" -}}{{- end -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- $viewHeight := add $viewBottom 16 -}}
+
+{{- /* 三个延后出现的元素，具体值在两个分支里按各自的节奏算 */ -}}
+{{- $ruleDelay := 0 -}}
+{{- $subDelay := 0 -}}
+{{- $hintDelay := 0 -}}
+
+<section id="home-hero" class="home-hero" aria-label="{{ $title }}">
+  <div class="home-hero__media" aria-hidden="true">
+    {{- with $banner }}
+      <img src="{{ . | relURL }}" alt="" fetchpriority="high" decoding="async" />
+    {{- end }}
+  </div>
+  <div class="home-hero__veil" aria-hidden="true"></div>
+  <div class="home-hero__grain" aria-hidden="true"></div>
+
+  {{- with .Site.Params.menu }}
+    <nav class="home-hero__nav" aria-label="首屏导航">
+      {{- range . }}
+        {{- if not .children }}
+          <a
+            class="home-hero__nav-link"
+            href="{{ .url | relLangURL }}"
+            {{ if .external }}target="_blank" rel="noopener noreferrer"{{ end }}
+          >{{ i18n .name }}</a>
+        {{- end }}
+      {{- end }}
+    </nav>
+  {{- end }}
+
+  <div class="home-hero__inner">
+    {{- if $canWrite }}
+      {{- $cursor := $start -}}
+      {{- $x := 0 -}}
+      <h1 class="home-hero__title home-hero__title--stroke">
+        <span class="home-hero__sr">{{ $title }}</span>
+        <svg
+          class="home-hero__word"
+          viewBox="-8 -8 {{ add $wordWidth 16 }} {{ $viewHeight }}"
+          aria-hidden="true"
+          focusable="false"
+          preserveAspectRatio="xMidYMid meet"
+        >
+          {{- range $i, $c := $chars -}}
+            {{- $g := index $glyphs $c -}}
+            {{- if gt $i 0 -}}{{- $x = add $x $spacing -}}{{- end -}}
+            {{- if $g.s }}
+              <g transform="translate({{ $x }} 0)">
+                {{- range $g.s -}}
+                  {{- $dur := int (mul .sw $speed) -}}
+                  <path
+                    class="home-hero__stroke"
+                    pathLength="1"
+                    d="{{ .d }}"
+                    style="--o:{{ $cursor }};--dur:{{ $dur }}ms"
+                  />
+                  {{- $cursor = add $cursor (add $dur $gap) -}}
+                {{- end }}
+              </g>
+            {{- end -}}
+            {{- $x = add $x $g.aw -}}
+            {{- $cursor = add $cursor $letterGap -}}
+          {{- end }}
+        </svg>
+      </h1>
+      {{- $ruleDelay = add $cursor 120 -}}
+      {{- $subDelay = add $ruleDelay 140 -}}
+      {{- $hintDelay = add $subDelay 260 -}}
+      <span class="home-hero__rule" aria-hidden="true" style="--d:{{ $ruleDelay }}"></span>
+      {{- with $subtitle }}
+        <p class="home-hero__sub" style="--d:{{ $subDelay }}">{{ . }}</p>
+      {{- end }}
+    {{- else }}
+      {{- $n := len $chars -}}
+      {{- $ruleDelay = add $start (add (mul (sub $n 1) 95) 360) -}}
+      {{- $subDelay = add $ruleDelay 220 -}}
+      {{- $hintDelay = add $subDelay 420 -}}
+      <h1 class="home-hero__title" aria-label="{{ $title }}">
+        {{- range $i, $c := $chars -}}
+          {{- if eq $c " " -}}
+            <span class="home-hero__space" aria-hidden="true"></span>
+          {{- else -}}
+            <span class="home-hero__char" aria-hidden="true" style="--d:{{ add $start (mul $i 95) }}">{{ $c }}</span>
+          {{- end -}}
+        {{- end -}}
+      </h1>
+      <span class="home-hero__rule" aria-hidden="true" style="--d:{{ $ruleDelay }}"></span>
+      {{- with $subtitle }}
+        <p class="home-hero__sub" style="--d:{{ $subDelay }}">{{ . }}</p>
+      {{- end }}
+    {{- end }}
+  </div>
+
+  <button class="home-hero__scroll" type="button" aria-label="向下滚动查看文章" style="--d:{{ $hintDelay }}">
+    <span class="home-hero__scroll-word">SCROLL</span>
+    <span class="home-hero__scroll-line" aria-hidden="true"></span>
+  </button>
+
+  <noscript>
+    <style>
+      /* JS 关闭时退回普通长页面，保证内容可读可滚动 */
+      .home-hero, .deck-backdrop { display: none !important; }
+      body.home-deck { overflow: auto !important; height: auto !important; }
+      body.home-deck #wrap { position: absolute !important; height: auto !important; overflow: visible !important; background: var(--color-background) !important; }
+      body.home-deck #content, body.home-deck #footer { transform: none !important; }
+      body.home-deck #footer { background-color: linear-gradient(to top, var(--color-footer-background) 50%, transparent) !important; }
+      body.home-deck #header-nav { opacity: 1 !important; pointer-events: auto !important; }
+    </style>
+  </noscript>
+</section>

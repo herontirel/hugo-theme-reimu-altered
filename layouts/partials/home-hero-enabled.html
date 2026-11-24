@@ -1,0 +1,31 @@
+{{- /*
+  首页首屏（deck）是否启用，供 baseof（body class + hero/backdrop）与 header.html 共用。
+
+  只有「首页第 1 页」才渲染 Hero；/page/2/ 等分页页直接落文章列表，
+  不再重放第一屏动画（翻页时也会带着 body.home-deck 出现，属于老 bug）。
+
+  判定用 .Paginator.PageNumber。注意：
+  · 分页渲染时页面上下文的 .RelPermalink 仍是 "/"，按 URL 判定无效（踩过）；
+  · **这里必须先用 posts 集合初始化分页器**：Hugo 对首页的 .Paginator 兜底会用
+    s.RegularPages()（全站 52 篇），而 baseof 比主内容先执行本 partial，
+    sync.Once 只认第一次调用——不初始化的话 index.html 传的 posts 集合会被
+    整个忽略，about/friends/bad-friend 等 root 页面就会混进首页文章列表（踩过）。
+    代价是集合与排序要在这里和 index.html 保持一致（mainSections 过滤 +
+    sort_order.home 未配置时不排序）；若以后设置 sort_order.home，这里要同步。
+*/ -}}
+{{- $on := and .IsHome (.Site.Params.home_hero | default dict).enable -}}
+{{- if $on -}}
+  {{- $posts := where .Site.RegularPages "Section" "in" .Site.Params.mainSections -}}
+  {{- $size := ((.Site.Params.paginate | default dict).post | default 0) -}}
+  {{- if gt $size 0 -}}
+    {{- $pag := .Paginate $posts $size -}}
+  {{- else -}}
+    {{- $pag := .Paginate $posts -}}
+  {{- end -}}
+  {{- with .Paginator -}}
+    {{- if ne .PageNumber 1 -}}
+      {{- $on = false -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- return $on -}}

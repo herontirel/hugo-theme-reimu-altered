@@ -1,0 +1,235 @@
+{{- /*
+  友链渲染短代码（参考 elykia / anzhiyu 的 flink-list-item 与 site-card 卡片）
+
+  用法：
+    {{< friendsLink >}}                  默认：封面卡片（site-card），按 badge 自动分组
+    {{< friendsLink "card" >}}           同上
+    {{< friendsLink "list" >}}           头像横排卡片（flink-list-item）
+    {{< friendsLink "card" "false" >}}   第二参数为 false 时不分组（平铺）
+    {{< friendsLink "compact" >}}        旧版样式，保留兼容：compact / detailed / standard
+    {{< friendsLink "card" "true" "false" >}} 第三参数 false 时关闭图片懒加载
+
+  数据字段（data/friends.yml）：
+    name  站点名（必填）
+    url   站点地址（必填）
+    image 头像（必填）
+    desc  一句话简介
+    cover 封面截图（可选，缺省用头像高斯模糊兜底）
+    badge 分组名
+    remark 分组描述（取该分组第一条的 remark）
+    style 卡片类型：card（封面卡片）/ list（横排头像卡片）
+          按分组生效，取该组第一条的值；不填则用短代码的第一个参数
+    tag   卡片左上角角标（可选）
+*/ -}}
+
+{{- /* ---------- 旧版样式模板（保留兼容） ---------- */ -}}
+{{- define "friend-standard" -}}
+  <div class="friend-item-wrap">
+    <a href="{{ .url }}" rel="noopener nofollow noreferrer" target="_blank"></a>
+    <div class="friend-icon-wrap">
+      <img class="no-lightbox" src="{{ .image }}" alt="{{ .name }}" />
+    </div>
+    <div class="friend-info-wrap">
+      <div class="friend-name-row">
+        <div class="friend-name">{{ .name }}</div>
+        {{- if .badge }}<span class="friend-badge">{{ .badge }}</span>{{- end }}
+      </div>
+      <div class="friend-desc">{{ .desc }}</div>
+      {{- if .remark }}<div class="friend-remark">{{ .remark }}</div>{{ end }}
+    </div>
+  </div>
+{{- end -}}
+
+{{- define "friend-compact" -}}
+  <div class="friend-item-wrap compact">
+    <a href="{{ .url }}" rel="noopener nofollow noreferrer" target="_blank"></a>
+    <div class="friend-icon-wrap compact">
+      <img class="no-lightbox" src="{{ .image }}" alt="{{ .name }}" />
+    </div>
+    <div class="friend-info-wrap compact">
+      <div class="friend-name compact">{{ .name }}</div>
+      <div class="friend-desc compact">{{ .desc }}</div>
+    </div>
+  </div>
+{{- end -}}
+
+{{- define "friend-detailed" -}}
+  <div class="friend-item-wrap detailed">
+    <a href="{{ .url }}" rel="noopener nofollow noreferrer" target="_blank"></a>
+    <div class="friend-icon-wrap detailed">
+      <img class="no-lightbox" src="{{ .image }}" alt="{{ .name }}" />
+    </div>
+    <div class="friend-info-wrap detailed">
+      <div class="friend-name-row">
+        <div class="friend-name detailed">{{ .name }}</div>
+        {{- if .badge }}<span class="friend-badge detailed">{{ .badge }}</span>{{ end }}
+      </div>
+      <div class="friend-desc detailed">{{ .desc }}</div>
+      {{- if .remark }}<div class="friend-remark detailed">{{ .remark }}</div>{{ end }}
+    </div>
+  </div>
+{{- end -}}
+
+{{- /* ---------- 新版卡片模板 ---------- */ -}}
+{{- define "friend-card" -}}
+  {{- $p := .p -}}
+  {{- $cover := $p.cover | default $p.image -}}
+  {{- $tag := $p.tag -}}
+  {{- if and (not .grouped) (not $tag) -}}{{- $tag = $p.badge -}}{{- end -}}
+  <div class="site-card{{ if not $p.cover }} is-avatar{{ end }} tone-{{ .tone }}">
+    {{- with $tag }}<span class="link-tag">{{ . }}<i class="light"></i></span>{{ end -}}
+    <a
+      class="flink-cover"
+      href="{{ $p.url }}"
+      title="{{ $p.name }}"
+      target="_blank"
+      rel="noopener nofollow noreferrer"
+    >
+      {{- if not $p.cover -}}
+        <span class="cover-mono" aria-hidden="true">{{ substr $p.name 0 1 }}</span>
+      {{- end -}}
+      {{- if .lazy -}}
+        <img
+          class="lazyload no-lightbox"
+          data-src="{{ $cover }}"
+          alt="{{ $p.name }}"
+          onerror="this.style.visibility='hidden'"
+        />
+      {{- else -}}
+        <img class="no-lightbox" src="{{ $cover }}" alt="{{ $p.name }}" />
+      {{- end -}}
+    </a>
+    <a
+      class="flink-info"
+      href="{{ $p.url }}"
+      title="{{ $p.name }}"
+      target="_blank"
+      rel="noopener nofollow noreferrer"
+    >
+      <span class="site-card-avatar">
+        <span class="img-mono" aria-hidden="true">{{ substr $p.name 0 1 }}</span>
+        {{- if .lazy -}}
+          <img
+            class="lazyload no-lightbox"
+            data-src="{{ $p.image }}"
+            alt="{{ $p.name }}"
+            onerror="this.style.visibility='hidden'"
+          />
+        {{- else -}}
+          <img class="no-lightbox" src="{{ $p.image }}" alt="{{ $p.name }}" />
+        {{- end -}}
+      </span>
+      <span class="site-card-text">
+        <span class="title">{{ $p.name }}</span>
+        {{- with $p.desc }}<span class="desc">{{ . }}</span>{{ end -}}
+      </span>
+    </a>
+  </div>
+{{- end -}}
+
+{{- define "friend-list-item" -}}
+  {{- $p := .p -}}
+  {{- $tag := $p.tag -}}
+  {{- if and (not .grouped) (not $tag) -}}{{- $tag = $p.badge -}}{{- end -}}
+  <div class="flink-list-item tone-{{ .tone }}">
+    {{- with $tag }}<span class="link-tag">{{ . }}<i class="light"></i></span>{{ end -}}
+    <a
+      class="cf-friends-link"
+      href="{{ $p.url }}"
+      title="{{ $p.name }}"
+      target="_blank"
+      rel="noopener nofollow noreferrer"
+    >
+      <span class="flink-avatar">
+        <span class="img-mono" aria-hidden="true">{{ substr $p.name 0 1 }}</span>
+        {{- if .lazy -}}
+          <img
+            class="lazyload no-lightbox"
+            data-src="{{ $p.image }}"
+            alt="{{ $p.name }}"
+            onerror="this.style.visibility='hidden'"
+          />
+        {{- else -}}
+          <img class="no-lightbox" src="{{ $p.image }}" alt="{{ $p.name }}" />
+        {{- end -}}
+      </span>
+      <span class="flink-item-info">
+        <span class="flink-item-name">{{ $p.name }}</span>
+        {{- with $p.desc }}<span class="flink-item-desc">{{ . }}</span>{{ end -}}
+      </span>
+    </a>
+  </div>
+{{- end -}}
+
+{{- $friends := hugo.Data.friends -}}
+{{- $style := .Get 0 | default "card" -}}
+{{- $grouped := ne (.Get 1 | default "true") "false" -}}
+{{- $lazy := ne (.Get 2 | default "true") "false" -}}
+{{- if .Site.Params.friends.shuffle -}}
+  {{- $friends = shuffle $friends -}}
+{{- end -}}
+
+{{- if in (slice "standard" "compact" "detailed") $style -}}
+  <div class="friend-wrap{{ if eq $style "compact" }} compact{{ end }}{{ if eq $style "detailed" }} detailed{{ end }}" data-aos="zoom-in">
+    {{- range $friends -}}
+      {{- if eq $style "compact" -}}
+        {{- template "friend-compact" . -}}
+      {{- else if eq $style "detailed" -}}
+        {{- template "friend-detailed" . -}}
+      {{- else -}}
+        {{- template "friend-standard" . -}}
+      {{- end -}}
+    {{- end -}}
+  </div>
+{{- else -}}
+  {{- /* 按 badge 分组，保持数据文件中的出现顺序 */ -}}
+  {{- $sections := slice -}}
+  {{- if $grouped -}}
+    {{- $keys := slice -}}
+    {{- range $friends -}}
+      {{- $k := .badge | default "小伙伴" -}}
+      {{- if not (in $keys $k) -}}{{- $keys = $keys | append $k -}}{{- end -}}
+    {{- end -}}
+    {{- range $keys -}}
+      {{- $k := . -}}
+      {{- $items := slice -}}
+      {{- range $friends -}}
+        {{- if eq (.badge | default "小伙伴") $k -}}
+          {{- $items = $items | append . -}}
+        {{- end -}}
+      {{- end -}}
+      {{- /* 分组卡片类型：取该组第一条的 style，非法或缺省则回退短代码参数 */ -}}
+      {{- $gs := (index $items 0).style | default $style -}}
+      {{- if not (in (slice "card" "list") $gs) -}}{{- $gs = $style -}}{{- end -}}
+      {{- $sections = $sections | append (dict "name" $k "desc" (index $items 0).remark "items" $items "style" $gs) -}}
+    {{- end -}}
+  {{- else -}}
+    {{- $sections = slice (dict "name" "" "desc" "" "items" $friends "style" $style) -}}
+  {{- end -}}
+
+  <div class="friend-page flink style-{{ $style }}">
+    {{- range $sections }}
+      {{- $gs := .style }}
+      <section class="link-group{{ if eq $gs "list" }} is-list{{ end }}">
+        {{- if .name }}
+          <div class="power-title-bar">
+            <h2 id="{{ .name | urlize }}">
+              {{ .name }}<span class="link-group-count">{{ len .items }}</span>
+            </h2>
+            {{- with .desc }}<div class="flink-desc">{{ . }}</div>{{ end }}
+          </div>
+        {{- end }}
+        <div class="{{ if eq $gs "list" }}flink-list{{ else }}site-card-group{{ end }}">
+          {{- range .items -}}
+            {{- $args := dict "p" . "tone" (mod (hash.FNV32a .name) 8) "grouped" $grouped "lazy" $lazy -}}
+            {{- if eq $gs "list" -}}
+              {{- template "friend-list-item" $args -}}
+            {{- else -}}
+              {{- template "friend-card" $args -}}
+            {{- end -}}
+          {{- end }}
+        </div>
+      </section>
+    {{- end }}
+  </div>
+{{- end -}}

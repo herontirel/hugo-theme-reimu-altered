@@ -1,0 +1,88 @@
+{{- /*
+  失联友链列表（页面 /bad-friend/）
+
+  数据：data/bad-friends.yml，由 scripts/check_friends.py --write 生成，不要手改。
+  字段：name / url / desc / image / badge / status / kind / checked
+
+  约定：站名 / 头像 / 原地址都不是链接；原地址用 .bf-veil 遮罩盖住，悬停只显形不变得可点。
+  「查看存档」是页面上唯一的链接，指向 Internet Archive，不遮。
+
+  用法：
+    {{< badFriends >}}
+*/ -}}
+
+{{- $data := index hugo.Data "bad-friends" -}}
+{{- $entries := slice -}}
+{{- $last := "" -}}
+{{- with $data -}}
+  {{- with .entries -}}{{- $entries = . -}}{{- end -}}
+  {{- with .last_check -}}{{- $last = . -}}{{- end -}}
+{{- end -}}
+
+{{- $kinds := slice "dns_nx" "dns_loopback" "server" "timeout" "down" "missing" "other" -}}
+{{- $labels := dict "dns_nx" "域名已失效" "dns_loopback" "域名已停用" "server" "服务端错误" "timeout" "连接超时" "down" "无法访问" "missing" "首页 404" "other" "访问异常" -}}
+
+<div class="bad-friend-page">
+  {{- if not $entries }}
+    <div class="bf-empty">
+      <span class="bf-empty-icon">✦</span>
+      目前没有失联的友链，大家都还在。
+    </div>
+  {{- else }}
+    <div class="bf-summary">
+      <span class="bf-total">共 <b>{{ len $entries }}</b> 个失联站点</span>
+      {{- range $kinds }}
+        {{- $k := . -}}
+        {{- $n := 0 -}}
+        {{- range $entries -}}
+          {{- if eq (.kind | default "other") $k -}}{{- $n = add $n 1 -}}{{- end -}}
+        {{- end -}}
+        {{- if gt $n 0 -}}
+          <span class="bf-chip k-{{ $k }}">{{ index $labels $k }}<i>{{ $n }}</i></span>
+        {{- end -}}
+      {{- end }}
+      {{- with $last }}<span class="bf-date">最后巡检 {{ . }}</span>{{ end }}
+    </div>
+
+    <div class="bf-list">
+      {{- range $entries }}
+        {{- $kind := .kind | default "other" }}
+        <div class="bf-item k-{{ $kind }}">
+          {{- /* 站名 / 头像 / 原地址都不做链接：这是档案，不是第二份友链。
+                 原地址用 bf-veil 遮住，悬停只把文本显出来，仍然是纯文本、点不动。 */ -}}
+          <span class="bf-avatar">
+            <span class="img-mono" aria-hidden="true">{{ substr .name 0 1 }}</span>
+            <img
+              class="lazyload no-lightbox"
+              data-src="{{ .image }}"
+              alt="{{ .name }}"
+              onerror="this.style.visibility='hidden'"
+            />
+          </span>
+          <div class="bf-main">
+            <div class="bf-title">
+              <span class="bf-name">{{ .name }}</span>
+              <span class="bf-status k-{{ $kind }}">{{ .status }}</span>
+            </div>
+            <span class="bf-url bf-veil" title="原地址，可选中复制">{{ .url }}</span>
+            {{- with .desc }}<div class="bf-desc">{{ . }}</div>{{ end }}
+          </div>
+          <div class="bf-side">
+            {{- /* 和最近一次巡检同一天就不重复写了，顶部已经有「最后巡检」 */ -}}
+            {{- if and .checked (ne .checked $last) }}
+              <time class="bf-checked">确认于 {{ .checked }}</time>
+            {{- end }}
+            <a
+              class="bf-archive"
+              href="https://web.archive.org/web/2/{{ .url }}"
+              title="到 Internet Archive 找这份站点的历史快照"
+              target="_blank"
+              rel="noopener nofollow noreferrer"
+              >查看存档</a
+            >
+          </div>
+        </div>
+      {{- end }}
+    </div>
+  {{- end }}
+</div>

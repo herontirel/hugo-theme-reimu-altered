@@ -1,0 +1,14 @@
+name = 'hugo-theme-reimu-altered'
+license = 'MIT'
+licenselink = 'https://github.com/D-Sketon/hugo-theme-reimu/blob/main/LICENSE'
+description = 'A Hakurei Reimu style Hugo theme (unofficial altered fork of hugo-theme-reimu)'
+homepage = 'https://github.com/herontirel/hugo-theme-reimu-altered'
+demosite = 'https://blog.ovofish.com'
+
+tags = ['Blog', 'Chinese', 'Responsive', 'Dark', 'Light']
+features = ['Blog', 'Chinese', 'Responsive', 'Dark', 'Light']
+
+# 原作者信息保留，勿删（MIT 许可证要求保留版权声明）
+[author]
+name = 'D-Sketon'
+homepage = 'https://d-sketon.github.io/'

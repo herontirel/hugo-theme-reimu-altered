@@ -1,0 +1,17 @@
+{{- /*
+  首页第二屏（文章列表）的环境底图。
+
+  用与首屏完全相同的图片，只是高斯模糊 + 一层半透明罩，
+  让「首屏清晰 → 列表失焦」形成同一张图的连续感（参考 gaoice 的 ambient-art-stage）。
+  放在 #container 里、#wrap 之前：#wrap 是 z-index:1 的层叠上下文，
+  底图必须在它下面（z-index:0）才能从透明的 #wrap 里透出来。
+*/ -}}
+{{- $p := .Site.Params.home_hero | default dict -}}
+{{- $banner := $p.banner | default .Site.Params.banner -}}
+{{- $blur := $p.blur | default 26 -}}
+{{- with $banner }}
+  <div class="deck-backdrop" aria-hidden="true" style="--deck-blur:{{ $blur }}px">
+    <img src="{{ . | relURL }}" alt="" decoding="async" />
+    <span class="deck-backdrop__mask"></span>
+  </div>
+{{- end }}

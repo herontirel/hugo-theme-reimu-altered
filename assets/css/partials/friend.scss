@@ -1,0 +1,1132 @@
+.friend-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 16px 0;
+
+  @media #{$mg-normal} {
+    gap: 16px;
+  }
+}
+
+.friend-item-wrap {
+  width: calc(50% - 10px);
+  padding: 8px;
+  background: var(--color-wrap);
+  box-shadow: var(--shadow-card);
+  border-radius: $post-radius;
+  position: relative;
+  display: flex;
+  transition: 0.3s;
+  box-sizing: border-box;
+  overflow: hidden;
+
+  &:hover {
+    transform: scale(1.015);
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  @media #{$mg-normal} {
+    width: 100%;
+  }
+
+  a {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+  }
+}
+
+.friend-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  min-width: 0;
+  justify-content: space-between;
+
+  .friend-name {
+    flex-shrink: 1;
+    min-width: 0;
+  }
+}
+
+.friend-badge {
+  flex-shrink: 0;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: $tag-radius;
+  background: var(--red-1);
+  color: var(--color-wrap);
+  pointer-events: none;
+  transition: 0.3s;
+}
+
+.friend-icon-wrap {
+  height: 70px;
+  width: 70px;
+  padding-right: 20px;
+  pointer-events: none;
+  flex-shrink: 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    border-radius: $tag-radius;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.2s;
+    box-shadow: var(--shadow-card);
+  }
+
+  img.lazyloaded {
+    opacity: 1;
+    animation: blur 0.8s forwards;
+  }
+}
+
+.friend-info-wrap {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex: 1;
+
+  div {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.friend-name {
+  color: var(--red-2);
+  font-size: 18px;
+  font-weight: bold;
+  white-space: nowrap;
+  padding: 4px 0;
+}
+
+.friend-desc {
+  color: var(--grey-7);
+  font-size: 14px;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  margin: 4px 0;
+}
+
+.friend-remark {
+  color: var(--grey-9);
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 2px 0 0;
+}
+
+.friend-wrap.compact {
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.friend-item-wrap.compact {
+  width: calc(50% - 10px);
+  padding: 5px 8px;
+  gap: 8px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  overflow: hidden;
+
+  @media #{$mg-normal} {
+    width: 100%;
+  }
+}
+
+.friend-icon-wrap.compact {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  flex-shrink: 0;
+
+  img {
+    border-radius: $tag-radius;
+  }
+}
+
+.friend-info-wrap.compact {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 6px;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.friend-name.compact {
+  font-size: 15px;
+  white-space: nowrap;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.friend-desc.compact {
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  margin: 0;
+}
+
+.friend-wrap.detailed {
+  gap: 20px;
+  padding: 16px 0;
+}
+
+.friend-item-wrap.detailed {
+  width: 100%;
+  padding: 14px;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.friend-icon-wrap.detailed {
+  width: 85px;
+  height: 85px;
+  padding: 0;
+  flex-shrink: 0;
+
+  img {
+    border-radius: $tag-radius;
+  }
+}
+
+.friend-info-wrap.detailed {
+  gap: 4px;
+}
+
+.friend-name.detailed {
+  font-size: 20px;
+  padding: 2px 0;
+}
+
+.friend-desc.detailed {
+  font-size: 14px;
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  display: block;
+  line-height: 1.6;
+}
+
+.friend-remark.detailed {
+  font-size: 13px;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  margin: 4px 0 0;
+  color: var(--grey-7);
+}
+
+.friend-name-row .friend-name.detailed {
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+.friend-badge.detailed {
+  font-size: 12px;
+  padding: 3px 8px;
+}
+
+/* ============================================================
+   新版友链卡片：site-card / flink-list-item
+   （参考 elykia.cn/link 的卡片结构，改用主题的 --red-* 色板）
+   ============================================================ */
+
+.friend-page {
+  margin: 8px 0 12px;
+
+  /* 覆盖正文里 img 的默认样式 */
+  img {
+    display: block;
+    max-width: none;
+    margin: 0;
+    border-radius: 0;
+
+    /* 图片挂了时不显示 alt 文案与碎图图标 */
+    color: transparent;
+    font-size: 0;
+  }
+
+  img:not(.lazyload) {
+    opacity: 1;
+    transition: 0.3s;
+  }
+
+  a {
+    text-decoration: none !important;
+    border-bottom: none !important;
+
+    &:hover {
+      text-decoration: none !important;
+    }
+  }
+
+  /* 关掉正文外链图标（article.scss 的 a::after） */
+  a::after,
+  a:hover::after {
+    content: none !important;
+    display: none !important;
+  }
+}
+
+/* 分组标题 */
+.link-group {
+  & + .link-group {
+    margin-top: 4px;
+  }
+
+  .power-title-bar {
+    margin: 20px 0 2px;
+
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      font-size: 19px;
+      font-weight: bold;
+      line-height: 1.5;
+      color: var(--color-default);
+
+      &::before {
+        content: "";
+        position: static;
+        flex: 0 0 auto;
+        width: 4px;
+        height: 17px;
+        border: 0;
+        border-radius: 2px;
+        background: var(--red-1);
+        box-shadow: 0 0 6px var(--color-red-6-shadow);
+      }
+
+      &::after {
+        content: none !important;
+      }
+    }
+
+    .link-group-count {
+      font-size: 12px;
+      font-weight: normal;
+      color: var(--red-1);
+      background: var(--red-5);
+      border-radius: 20px;
+      padding: 1px 8px;
+      margin-left: -2px;
+    }
+
+    .flink-desc {
+      margin: 4px 0 0 12px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--grey-9);
+    }
+  }
+}
+
+/* 角标 + 流光 */
+.link-tag {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  padding: 3px 9px;
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 500;
+  color: #fff;
+  white-space: nowrap;
+  border-radius: 12px 0 12px 0;
+  background: var(--fr-gradient, linear-gradient(38deg, var(--red-2), var(--red-1)));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  pointer-events: none;
+  transition: left 0.35s ease;
+
+  .light {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100px;
+    height: 50px;
+    background-image: linear-gradient(
+      rgba(255, 255, 255, 0),
+      rgba(255, 255, 255, 0.55),
+      rgba(255, 255, 255, 0)
+    );
+    animation: friend-light 4s infinite both;
+  }
+}
+
+@keyframes friend-light {
+  0% {
+    transform: translate(-100px) rotate(45deg);
+  }
+  to {
+    transform: translate(300px) rotate(45deg);
+  }
+}
+
+/* 八种色调（封面兜底底色 + 角标渐变） */
+$fr-gradients: (
+  linear-gradient(135deg, #ff8a65 0%, #ff5252 100%),
+  linear-gradient(135deg, #b388ff 0%, #7c4dff 100%),
+  linear-gradient(135deg, #4dd0e1 0%, #2196f3 100%),
+  linear-gradient(135deg, #81c784 0%, #26a69a 100%),
+  linear-gradient(135deg, #ffd54f 0%, #ffa726 100%),
+  linear-gradient(135deg, #f06292 0%, #ec407a 100%),
+  linear-gradient(135deg, #7986cb 0%, #4a5bd6 100%),
+  linear-gradient(135deg, #a1887f 0%, #6d4c41 100%)
+);
+
+@for $i from 0 through 7 {
+  .tone-#{$i} {
+    --fr-gradient: #{nth($fr-gradients, $i + 1)};
+  }
+}
+
+/* ---------- 图片兜底：图挂了就显示首字色块，不露碎图 ---------- */
+
+.cover-mono {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.92);
+  background: linear-gradient(150deg, var(--red-4), var(--red-2));
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.16);
+  user-select: none;
+}
+
+.img-mono {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  background: var(--fr-gradient, linear-gradient(135deg, var(--red-2), var(--red-1)));
+}
+
+/* ---------- site-card：封面 + 信息条 ---------- */
+
+.site-card-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(186px, 1fr));
+  gap: 14px;
+  padding: 12px 0 4px;
+}
+
+.site-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 200px;
+  background: var(--color-wrap);
+  border: 1px solid var(--color-h2-border);
+  border-radius: $post-radius + 2px;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  transform: translateZ(0);
+  transition:
+    background 0.3s,
+    border-color 0.3s,
+    box-shadow 0.3s,
+    transform 0.3s;
+
+  .flink-cover {
+    position: relative;
+    display: block;
+    flex: 0 0 auto;
+    height: 120px;
+    overflow: hidden;
+    background: linear-gradient(150deg, var(--red-4), var(--red-2));
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0) 45%, rgba(0, 0, 0, 0.16));
+      pointer-events: none;
+      transition: background 0.3s;
+    }
+
+    img {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(1.03);
+      transition:
+        transform 0.45s ease,
+        filter 0.3s ease;
+    }
+  }
+
+  /* 没有 cover 时用头像高斯模糊当封面 */
+  &.is-avatar .flink-cover img {
+    filter: blur(15px) saturate(1.25) brightness(1.02) !important;
+    transform: scale(1.35);
+  }
+
+  .flink-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    flex: 1;
+    min-height: 0;
+    padding: 9px 10px;
+    transition: gap 0.3s;
+  }
+
+  .site-card-avatar {
+    position: relative;
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+    margin-top: 3px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--color-background);
+    transition:
+      width 0.3s,
+      height 0.3s,
+      margin 0.3s,
+      opacity 0.3s;
+
+    img {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+  }
+
+  .site-card-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+
+    .title {
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.35;
+      color: var(--color-default);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: color 0.3s;
+    }
+
+    .desc {
+      font-size: 12.5px;
+      line-height: 1.45;
+      color: var(--grey-9);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      transition: color 0.3s;
+    }
+  }
+}
+
+/* 深色模式下模糊封面跟随主题压暗 */
+[data-theme="dark"] .friend-page .site-card.is-avatar .flink-cover img {
+  filter: blur(15px) saturate(1.2) brightness(0.66) !important;
+}
+
+/* ---------- flink-list-item：头像 + 名称 ---------- */
+
+.flink-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(248px, 1fr));
+  gap: 12px;
+  padding: 12px 0 4px;
+}
+
+.flink-list-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 88px;
+  background: var(--color-wrap);
+  border: 1px solid var(--color-h2-border);
+  border-radius: $post-radius + 2px;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  transform: translateZ(0);
+  transition:
+    background 0.3s,
+    border-color 0.3s,
+    box-shadow 0.3s,
+    transform 0.3s;
+
+  .cf-friends-link {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 0 8px;
+  }
+
+  .flink-avatar {
+    position: relative;
+    flex: 0 0 auto;
+    width: 58px;
+    height: 58px;
+    margin: 0 14px 0 4px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--color-background);
+    transition:
+      width 0.3s,
+      height 0.3s,
+      margin 0.3s,
+      opacity 0.3s;
+
+    img {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .img-mono {
+      font-size: 20px;
+    }
+  }
+
+  .flink-item-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+
+    .flink-item-name {
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.35;
+      color: var(--color-default);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: color 0.3s;
+    }
+
+    .flink-item-desc {
+      font-size: 13px;
+      line-height: 1.4;
+      color: var(--grey-9);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      transition: color 0.3s;
+    }
+  }
+}
+
+/* ---------- 悬停：整卡填充主题色 ---------- */
+
+@media (hover: hover) and (pointer: fine) {
+  .site-card:hover,
+  .site-card:focus-within {
+    background: var(--red-1);
+    border-color: var(--red-1);
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-2px);
+
+    .flink-cover::before {
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .flink-cover img {
+      transform: scale(1.1);
+    }
+
+    &.is-avatar .flink-cover img {
+      transform: scale(1.42);
+    }
+
+    .link-tag {
+      left: -110px;
+    }
+
+    .flink-info {
+      gap: 0;
+    }
+
+    .site-card-avatar {
+      width: 0;
+      height: 0;
+      margin: 3px 0 0;
+      opacity: 0;
+    }
+
+    .site-card-text .title {
+      color: #fff;
+    }
+
+    .site-card-text .desc {
+      color: rgba(255, 255, 255, 0.86);
+      -webkit-line-clamp: 4;
+      line-clamp: 4;
+    }
+  }
+
+  .flink-list-item:hover,
+  .flink-list-item:focus-within {
+    background: var(--red-1);
+    border-color: var(--red-1);
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-2px);
+
+    .link-tag {
+      left: -110px;
+    }
+
+    .flink-avatar {
+      width: 0;
+      height: 0;
+      margin: 0;
+      opacity: 0;
+    }
+
+    .flink-item-name {
+      color: #fff;
+    }
+
+    .flink-item-desc {
+      color: rgba(255, 255, 255, 0.86);
+    }
+  }
+}
+
+@media (hover: none) {
+  .site-card:active,
+  .flink-list-item:active {
+    transform: scale(0.985);
+  }
+}
+
+/* ---------- 响应式 ---------- */
+
+@media #{$mg-large} {
+  .site-card-group {
+    grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+    gap: 12px;
+  }
+
+  .flink-list {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+  }
+}
+
+@media #{$mg-normal} {
+  .site-card {
+    height: 176px;
+
+    .flink-cover {
+      height: 100px;
+    }
+
+    .site-card-text .desc {
+      -webkit-line-clamp: 1;
+      line-clamp: 1;
+    }
+  }
+
+  .flink-list-item {
+    height: 80px;
+
+    .flink-avatar {
+      width: 52px;
+      height: 52px;
+      margin: 0 12px 0 2px;
+    }
+
+    .flink-item-name {
+      font-size: 16px;
+    }
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .site-card-group {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .flink-list {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .link-group .power-title-bar h2 {
+    font-size: 17px;
+  }
+}
+
+/* ---------- 失联友链页（/bad-friend/） ---------- */
+
+.bad-friend-page {
+  margin: 6px 0 4px;
+
+  /* 正文里所有 a 都会被塞一个外链小图标，这里是 UI 列表，统一去掉 */
+  a::after {
+    content: none !important;
+  }
+
+  .bf-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 34px 16px;
+    font-size: 14px;
+    color: var(--grey-9);
+    border: 1px dashed var(--color-h2-border);
+    border-radius: $post-radius;
+    background: var(--color-wrap);
+  }
+
+  .bf-empty-icon {
+    font-size: 18px;
+    color: var(--red-1);
+  }
+
+  /* 顶部统计条 */
+  .bf-summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: $post-radius;
+    background: var(--color-wrap);
+    border: 1px solid var(--color-h2-border);
+    font-size: 13px;
+    color: var(--grey-9);
+  }
+
+  .bf-total {
+    margin-right: 2px;
+
+    b {
+      font-size: 16px;
+      color: var(--red-1);
+      margin: 0 1px;
+    }
+  }
+
+  .bf-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 9px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 20px;
+    color: var(--grey-9);
+    background: rgba(128, 128, 128, 0.12);
+
+    i {
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    &.k-server,
+    &.k-down {
+      color: var(--red-1);
+      background: var(--red-5);
+    }
+
+    &.k-timeout {
+      color: #c07a17;
+      background: rgba(224, 158, 50, 0.16);
+    }
+  }
+
+  .bf-date {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--grey-9);
+    opacity: 0.85;
+  }
+
+  /* 条目列表 */
+  .bf-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .bf-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    border-radius: $post-radius;
+    background: var(--color-wrap);
+    border: 1px solid var(--color-h2-border);
+    /* 整条不可点，所以不做 hover 反馈——有反馈就等于暗示这里能点进去 */
+  }
+
+  .bf-avatar {
+    display: block;
+    cursor: default;
+    position: relative;
+    flex: 0 0 auto;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--color-background);
+
+    img {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 12px;
+      filter: grayscale(1) opacity(0.72);
+    }
+
+    .img-mono {
+      font-size: 18px;
+      filter: grayscale(0.55);
+      opacity: 0.8;
+    }
+  }
+
+  .bf-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .bf-title {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .bf-name {
+    font-size: 15.5px;
+    font-weight: 700;
+    color: var(--color-default);
+    line-height: 1.4;
+  }
+
+  /* 站点真的没了（域名失效/停用）就把名字压暗 + 划掉，一眼分得清 */
+  .k-dns_nx .bf-name,
+  .k-dns_loopback .bf-name {
+    color: var(--grey-9);
+    text-decoration: line-through;
+    text-decoration-color: rgba(128, 128, 128, 0.55);
+    text-decoration-thickness: 1px;
+  }
+
+  .bf-status {
+    flex: 0 0 auto;
+    padding: 1px 8px;
+    font-size: 11.5px;
+    line-height: 1.6;
+    border-radius: 20px;
+    color: var(--grey-9);
+    background: rgba(128, 128, 128, 0.13);
+    white-space: nowrap;
+
+    &.k-server,
+    &.k-down {
+      color: var(--red-1);
+      background: var(--red-5);
+    }
+
+    &.k-timeout {
+      color: #c07a17;
+      background: rgba(224, 158, 50, 0.16);
+    }
+
+    &.k-dns_loopback {
+      color: #7f6bb0;
+      background: rgba(127, 107, 176, 0.14);
+    }
+  }
+
+  .bf-url {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    margin-top: 3px;
+    font-size: 12px;
+    font-family: var(--font-mono, "JetBrains Mono", Consolas, monospace);
+    color: var(--grey-9);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: top;
+    border-radius: 3px;
+    /* 纯文本，不是链接：不换手型、不变色、不画下划线 */
+    cursor: default;
+    user-select: text;
+    transition: color 0.22s ease;
+
+    /* 悬停只是"看清"，不给出任何可点暗示 */
+    &:hover {
+      color: var(--color-default);
+    }
+  }
+
+  /* 遮罩：默认把内容盖住，鼠标移上来才显形。
+     用伪元素实现——不动 DOM，伪元素也不参与事件，点不到它。 */
+  .bf-veil {
+    position: relative;
+    isolation: isolate;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      border-radius: inherit;
+      background: var(--bf-veil-bg, rgba(9, 9, 12, 0.95));
+      backdrop-filter: blur(3px);
+      transition: opacity 0.22s ease;
+      pointer-events: none;
+    }
+
+    &:hover::before,
+    &:focus-visible::before {
+      opacity: 0;
+    }
+  }
+
+  /* 触屏设备没有 hover 这回事，遮住就等于永远看不见，直接不遮 */
+  @media (hover: none) {
+    .bf-veil::before {
+      display: none;
+    }
+  }
+
+  .bf-desc {
+    margin-top: 3px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--grey-9);
+    opacity: 0.9;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+  }
+
+  .bf-side {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+  }
+
+  .bf-checked {
+    font-size: 11.5px;
+    color: var(--grey-9);
+    opacity: 0.75;
+  }
+
+  .bf-archive {
+    padding: 3px 10px;
+    font-size: 12px;
+    border-radius: 20px;
+    border: 1px solid var(--color-h2-border);
+    color: var(--grey-9);
+    white-space: nowrap;
+    transition:
+      color 0.25s,
+      background 0.25s,
+      border-color 0.25s;
+
+    &:hover {
+      color: #fff;
+      background: var(--red-1);
+      border-color: var(--red-1);
+    }
+  }
+}
+
+@media #{$mg-normal} {
+  .bad-friend-page {
+    .bf-item {
+      padding: 10px 12px;
+      gap: 10px;
+    }
+
+    .bf-avatar {
+      width: 40px;
+      height: 40px;
+    }
+
+    .bf-side .bf-checked {
+      display: none;
+    }
+
+    .bf-desc {
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .bad-friend-page {
+    .bf-archive {
+      padding: 3px 8px;
+      font-size: 11px;
+    }
+
+    .bf-name {
+      font-size: 14.5px;
+    }
+  }
+}
